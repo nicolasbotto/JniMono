@@ -37,7 +37,12 @@ public:
         if (systemObject == NULL)
         {
             writer.StartObject();
+            writer.String("Java_Type");
+            writer.String("NULL");
+            writer.String("Java_Value");
+            writer.Null();
             writer.EndObject();
+            return;
         }
 
         string className = mono_class_get_name(mono_object_get_class(systemObject));

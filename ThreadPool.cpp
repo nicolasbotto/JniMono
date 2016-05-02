@@ -29,20 +29,20 @@ void* start_thread(void* arg)
 
 int ThreadPool::initialize_threadpool()
 {
-  // TODO: Implement lazy loading threads instead of creating all at once
-  m_pool_state = STARTED;
-  int ret = -1;
-  for (int i = 0; i < m_pool_size; i++) {
-    pthread_t tid;
-    ret = pthread_create(&tid, NULL, start_thread, (void*) this);
-    if (ret != 0) {
-      cerr << "pthread_create() failed: " << ret << endl;
-      return -1;
+    // TODO: Implement lazy loading threads instead of creating all at once
+    m_pool_state = STARTED;
+    for (int i = 0; i < m_pool_size; i++) 
+    {
+        pthread_t tid;
+        if (pthread_create(&tid, NULL, start_thread, (void*) this) != 0) 
+        {
+            cerr << "pthread_create() failed" << endl;
+            return -1;
+        }
+        m_threads.push_back(tid);
     }
-    m_threads.push_back(tid);
-  }
 
-  return 0;
+    return 0;
 }
 
 int ThreadPool::destroy_threadpool()
@@ -53,7 +53,6 @@ int ThreadPool::destroy_threadpool()
   
   m_task_cond_var.broadcast(); // notify all threads to shut down
 
-  int ret = -1;
   for (int i = 0; i < m_pool_size; i++) {
     void* result;
     ret = pthread_join(m_threads[i], &result);
