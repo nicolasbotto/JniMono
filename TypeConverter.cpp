@@ -1,4 +1,5 @@
 #include "TypeConverter.h"
+#include "b64.h"
 
 using namespace std;
 
@@ -30,64 +31,64 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
 
     MonoObject* result = NULL;
     
-    if(!jsonValue.HasMember("Mono_Type"))
+    if(!jsonValue.HasMember("Jni_Type"))
     {
         return result;
     }
     
-    string className = jsonValue["Mono_Type"].GetString();
+    string className = jsonValue["Jni_Type"].GetString();
     
     if (className == "Int32")
     {
-        int value = jsonValue["Mono_Value"].GetInt();
+        int value = jsonValue["Jni_Value"].GetInt();
         result = mono_value_box(monoDomain, mono_get_int32_class(), &value);
     }
 
     if (className == "String")
     {
-        string value = jsonValue["Mono_Value"].GetString();
+        string value = jsonValue["Jni_Value"].GetString();
         result = (MonoObject*)mono_string_new(monoDomain, value.c_str());
     }
 
     if (className == "Boolean")
     {
-        bool value = jsonValue["Mono_Value"].GetBool();
+        bool value = jsonValue["Jni_Value"].GetBool();
         result = (MonoObject*)mono_value_box(monoDomain, mono_get_boolean_class(), &value);
     }
 
     if (className == "Char")
     {
-        char value = (char)jsonValue["Mono_Value"].GetInt();
+        char value = (char)jsonValue["Jni_Value"].GetInt();
         result = (MonoObject*)mono_value_box(monoDomain, mono_get_char_class(), &value);
     }
 
     if (className == "Int64")
     {
-        long value = jsonValue["Mono_Value"].GetInt64();
+        long value = jsonValue["Jni_Value"].GetInt64();
         result = (MonoObject*)mono_value_box(monoDomain, mono_get_int64_class(), &value);
     }
 
     if (className == "Int16")
     {
-        short value = (short)jsonValue["Mono_Value"].GetInt();
+        short value = (short)jsonValue["Jni_Value"].GetInt();
         result = (MonoObject*)mono_value_box(monoDomain, mono_get_int16_class(), &value);
     }
 
     if (className =="Byte")
     {
-        byte value = (byte)jsonValue["Mono_Value"].GetUint();
+        byte value = (byte)jsonValue["Jni_Value"].GetUint();
         result = (MonoObject*)mono_value_box(monoDomain, mono_get_byte_class(), &value);
     }
 
     if (className == "Double" )
     {
-        double value = jsonValue["Mono_Value"].GetDouble();
+        double value = jsonValue["Jni_Value"].GetDouble();
         result = (MonoObject*)mono_value_box(monoDomain, mono_get_double_class(), &value);
     }
 
     if (className == "Single" )
     {
-        float value = (float)jsonValue["Mono_Value"].GetDouble();
+        float value = (float)jsonValue["Jni_Value"].GetDouble();
         result = (MonoObject*)mono_value_box(monoDomain, mono_get_single_class(), &value);
     }
 
@@ -96,9 +97,9 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
         /* Fill method arguments */
         MonoObject* dictionaryInstance = mono_runtime_invoke(createDictionary, NULL, NULL, NULL);
 
-        if(jsonValue.HasMember("Mono_Value"))
+        if(jsonValue.HasMember("Jni_Value"))
         {
-            for (Value::ConstMemberIterator itr = jsonValue["Mono_Value"].MemberBegin(); itr != jsonValue["Mono_Value"].MemberEnd(); ++itr)
+            for (Value::ConstMemberIterator itr = jsonValue["Jni_Value"].MemberBegin(); itr != jsonValue["Jni_Value"].MemberEnd(); ++itr)
             {
                 string keyName = string(itr->name.GetString());
                 const GenericValue<UTF8<> >& mapValue = itr->value;
@@ -124,7 +125,7 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
     
     if (className == "Int32[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
@@ -141,7 +142,7 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
     
     if (className == "Byte[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        /*const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
@@ -153,12 +154,31 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
             }
 
             result = (MonoObject*)data;
+        }*/
+
+        // java json serializer uses base64 encoding
+        const Value& input = jsonValue["Jni_Value"];
+        
+        string jsonData = input.GetString();
+        
+        string decoded = base64_decode(jsonData);
+        
+        int size = decoded.size();
+       
+        MonoArray *data = mono_array_new (monoDomain, mono_get_byte_class(), size);
+
+        for (SizeType i = 0; i < size; i++)
+        {
+            mono_array_set(data, uint8_t, i, decoded.at(i));
         }
+
+        result = (MonoObject*)data;
+        
     }
     
     if (className == "Char[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        /*const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
@@ -170,12 +190,28 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
             }
 
             result = (MonoObject*)data;
+        }*/
+        
+        const Value& input = jsonValue["Jni_Value"];
+        
+        string jsonData = input.GetString();
+        
+        int size = jsonData.size();
+       
+        MonoArray *data = mono_array_new (monoDomain, mono_get_char_class(), size);
+
+        for (SizeType i = 0; i < size; i++)
+        {
+            mono_array_set(data, mono_unichar2, i, jsonData.at(i));
         }
+
+        result = (MonoObject*)data;
+        
     }
     
     if (className == "Double[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
@@ -192,7 +228,7 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
     
     if (className == "Bool[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
@@ -209,7 +245,7 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
     
     if (className == "Short[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
@@ -226,7 +262,7 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
     
     if (className == "Long[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
@@ -243,7 +279,7 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
     
     if (className == "Float[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
@@ -260,7 +296,7 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
     
     if (className == "String[]")
     {
-        const Value& arr = jsonValue["Mono_Value"];
+        const Value& arr = jsonValue["Jni_Value"];
 
         if(arr.IsArray())
         {
