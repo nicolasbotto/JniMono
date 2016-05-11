@@ -58,7 +58,7 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
 
     if (className == "Char")
     {
-        char value = (char)jsonValue["Jni_Value"].GetInt();
+        char value = (char)jsonValue["Jni_Value"].GetString()[0];
         result = (MonoObject*)mono_value_box(monoDomain, mono_get_char_class(), &value);
     }
 
@@ -76,8 +76,9 @@ MonoObject* TypeConverter::toMonoObject(const GenericValue<UTF8<> >& jsonValue)
 
     if (className =="Byte")
     {
-        byte value = (byte)jsonValue["Jni_Value"].GetUint();
-        result = (MonoObject*)mono_value_box(monoDomain, mono_get_byte_class(), &value);
+        string encoded = jsonValue["Jni_Value"].GetString();
+        string decoded = base64_decode(encoded);
+        result = (MonoObject*)mono_value_box(monoDomain, mono_get_byte_class(), &decoded.at(0));
     }
 
     if (className == "Double" )
