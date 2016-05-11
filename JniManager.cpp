@@ -67,7 +67,7 @@ void JniManager::toProcessRequest(string input, MonoObject* processRequest)
     MonoString* assemblyPath = mono_string_new(monoDomain, d["assemblyPath"].GetString());
     MonoString* methodName = mono_string_new(monoDomain, d["methodName"].GetString());
     bool fullTrust = true;
-    bool notifyEvents = d["instrument"].GetBool();
+    bool notifyEvents = d["notifyEvents"].GetBool();
 
     MonoObject* exception = NULL;
 
@@ -102,7 +102,7 @@ void JniManager::toProcessRequest(string input, MonoObject* processRequest)
     }
     
     /* Fill method arguments */
-    if(d.HasMember("methodArguments"))
+    if(d.HasMember("methodArguments") && d["methodArguments"].IsObject())
     {
         for (Value::ConstMemberIterator itr = d["methodArguments"].MemberBegin(); itr != d["methodArguments"].MemberEnd(); ++itr)
         {
@@ -124,7 +124,7 @@ void JniManager::toProcessRequest(string input, MonoObject* processRequest)
     }
     
     /* Fill invocation properties */
-    if(d.HasMember("invocationProperties"))
+    if(d.HasMember("invocationProperties") && d["invocationProperties"].IsObject())
     {
         for (Value::ConstMemberIterator itr = d["invocationProperties"].MemberBegin(); itr != d["invocationProperties"].MemberEnd(); ++itr)
         {
@@ -146,7 +146,7 @@ void JniManager::toProcessRequest(string input, MonoObject* processRequest)
     }
     
     /* Fill inbound properties */
-    if(d.HasMember("inboundProperties"))
+    if(d.HasMember("inboundProperties") && d["inboundProperties"].IsObject())
     {
         for (Value::ConstMemberIterator itr = d["inboundProperties"].MemberBegin(); itr != d["inboundProperties"].MemberEnd(); ++itr)
         {
@@ -168,7 +168,7 @@ void JniManager::toProcessRequest(string input, MonoObject* processRequest)
     }
     
     /* Fill outbound properties */
-    if(d.HasMember("outboundProperties"))
+    if(d.HasMember("outboundProperties") && d["outboundProperties"].IsObject())
     {
         for (Value::ConstMemberIterator itr = d["outboundProperties"].MemberBegin(); itr != d["outboundProperties"].MemberEnd(); ++itr)
         {
@@ -190,7 +190,7 @@ void JniManager::toProcessRequest(string input, MonoObject* processRequest)
     }
     
     /* Fill session properties */
-    if(d.HasMember("sessionProperties"))
+    if(d.HasMember("sessionProperties") && d["sessionProperties"].IsObject())
     {
         for (Value::ConstMemberIterator itr = d["sessionProperties"].MemberBegin(); itr != d["sessionProperties"].MemberEnd(); ++itr)
         {

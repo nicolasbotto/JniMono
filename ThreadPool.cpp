@@ -55,7 +55,7 @@ int ThreadPool::destroy_threadpool()
 
   for (int i = 0; i < m_pool_size; i++) {
     void* result;
-    ret = pthread_join(m_threads[i], &result);
+    pthread_join(m_threads[i], &result);
     m_task_cond_var.broadcast(); // try waking up a bunch of threads that are still waiting
   }
   return 0;

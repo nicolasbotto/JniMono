@@ -37,9 +37,9 @@ public:
         if (systemObject == NULL)
         {
             writer.StartObject();
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("NULL");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Null();
             writer.EndObject();
             return;
@@ -53,9 +53,9 @@ public:
         {
             int value = *(int*)mono_object_unbox(systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.Integer");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Int(value);
         }
 
@@ -63,9 +63,9 @@ public:
         {
             double value = *(double*)mono_object_unbox(systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.Double");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Double(value);
         }
 
@@ -73,9 +73,9 @@ public:
         {
             bool value = *(bool*)mono_object_unbox(systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.Boolean");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Bool(value);
         }
 
@@ -83,9 +83,9 @@ public:
         {
             char value = *(char*)mono_object_unbox(systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.Character");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Int(value);
         }
 
@@ -93,9 +93,9 @@ public:
         {
             short value = *(short*)mono_object_unbox(systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.Short");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Int(value);
         }
 
@@ -103,9 +103,9 @@ public:
         {
             float value = *(float*)mono_object_unbox(systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.Float");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Double(value);
         }
 
@@ -113,9 +113,9 @@ public:
         {
             long long value = *(long long*)mono_object_unbox(systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.Long");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Int64(value);
         }
 
@@ -123,9 +123,9 @@ public:
         {
             byte value = *(byte*)mono_object_unbox(systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.Byte");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.Uint(value);
         }
 
@@ -133,9 +133,9 @@ public:
         {
             char* cString = mono_string_to_utf8((MonoString*)systemObject);
 
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("java.lang.String");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
             writer.String(cString);
 
             mono_free(cString);
@@ -144,9 +144,9 @@ public:
         // Arrays
         if (className == "String[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[Ljava.lang.String;");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -168,9 +168,9 @@ public:
         
         if (className == "Byte[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[B");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -186,27 +186,9 @@ public:
         
         if (className == "Int32[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[I");
-            writer.String("Java_Value");
-
-            MonoArray *data = (MonoArray*)systemObject;
-            uintptr_t intsSize = mono_array_length(data);
-
-            writer.StartArray();
-            for (int i = 0; i < intsSize; i++)
-            {
-                writer.Int(mono_array_get(data, int, i));
-            }
-
-            writer.EndArray();
-        }
-        
-        if (className == "Int32[]")
-        {
-            writer.String("Java_Type");
-            writer.String("[I");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -222,9 +204,9 @@ public:
         
         if (className == "Int16[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[S");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -240,9 +222,9 @@ public:
         
         if (className == "Int64[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[J");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -258,9 +240,9 @@ public:
         
         if (className == "Boolean[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[Z");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -276,9 +258,9 @@ public:
         
         if (className == "Double[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[D");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -294,9 +276,9 @@ public:
         
         if (className == "Single[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[F");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -312,9 +294,9 @@ public:
         
         if (className == "Char[]")
         {
-            writer.String("Java_Type");
+            writer.String("Jni_Type");
             writer.String("[C");
-            writer.String("Java_Value");
+            writer.String("Jni_Value");
 
             MonoArray *data = (MonoArray*)systemObject;
             uintptr_t intsSize = mono_array_length(data);
@@ -358,9 +340,9 @@ public:
         }
 
         writer.StartObject();
-        writer.String("Java_Type");
+        writer.String("Jni_Type");
         writer.String("Map");
-        writer.String("Java_Value");
+        writer.String("Jni_Value");
         
         writer.StartObject();
         int size = *(int*)mono_object_unbox(resultSize);
